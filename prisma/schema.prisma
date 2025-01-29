@@ -16,6 +16,8 @@ model Product {
   image       String
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+
+  @@map("products")
 }
 
 enum ProductCategory {
@@ -36,6 +38,8 @@ model User {
   role      UserRole
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("users")
 }
 
 enum UserRole {

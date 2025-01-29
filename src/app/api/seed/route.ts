@@ -1,6 +1,7 @@
+import bcrypt from "bcrypt";
+
 import { USER_ROLES } from "@/constants/user-roles";
 import { db } from "@/lib/db";
-import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 
 export async function GET() {

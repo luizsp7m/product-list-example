@@ -35,6 +35,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { createProduct } from "@/actions/create-product";
+import { Loader2 } from "lucide-react";
+
 const productFormSchema = z.object({
   name: z.string().trim().min(3).max(50),
   category: z.nativeEnum(PRODUCT_CATEGORIES),
@@ -42,7 +45,7 @@ const productFormSchema = z.object({
   description: z.string().trim().min(3).max(250),
 });
 
-type ProductFormData = z.infer<typeof productFormSchema>;
+export type ProductFormData = z.infer<typeof productFormSchema>;
 
 export function ProductForm() {
   const form = useForm<ProductFormData>({
@@ -53,8 +56,12 @@ export function ProductForm() {
     },
   });
 
-  function onSubmit(values: ProductFormData) {
-    console.log(values);
+  async function onSubmit(data: ProductFormData) {
+    try {
+      await createProduct(data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -161,7 +168,12 @@ export function ProductForm() {
             Cancel
           </Link>
 
-          <Button type="submit">Create</Button>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && (
+              <Loader2 className="animate-spin" />
+            )}
+            Create
+          </Button>
         </div>
       </form>
     </Form>
