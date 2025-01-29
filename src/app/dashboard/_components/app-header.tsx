@@ -1,3 +1,4 @@
+import { LogoutButton } from "./logout-button";
 import { ModeToggle } from "./mode-toggle";
 import { NavItems } from "./nav-items";
 
@@ -10,7 +11,10 @@ export function AppHeader() {
           <NavItems />
         </div>
 
-        <ModeToggle />
+        <div className="flex items-center gap-2">
+          <ModeToggle />
+          <LogoutButton />
+        </div>
       </div>
     </div>
   );

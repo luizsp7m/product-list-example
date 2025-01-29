@@ -1,5 +1,6 @@
 "use client";
 
+import { AUTHENTICATED_ENTRY } from "@/constants/app-config";
 import clsx from "clsx";
 import Link from "next/link";
 
@@ -14,6 +15,10 @@ export function NavItems() {
   const pathname = usePathname();
 
   const isActiveLink = (route: string) => {
+    if (route === AUTHENTICATED_ENTRY) {
+      return route === pathname;
+    }
+
     return pathname.startsWith(route);
   };
 
