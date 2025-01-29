@@ -18,12 +18,15 @@ import {
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_OPTIONS,
 } from "@/constants/product-categories";
+
 import { Textarea } from "@/components/ui/textarea";
 import { MoneyInput } from "@/components/shared-components/money-input";
+
 import {
   Select,
   SelectContent,
