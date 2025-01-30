@@ -43,6 +43,14 @@ const productFormSchema = z.object({
   name: z.string().trim().min(3).max(50),
   category: z.nativeEnum(PRODUCT_CATEGORIES),
   price: z.number().positive(),
+  imageUrl: z.string().refine(
+    (value) => {
+      return value.startsWith("https://i.imgur.com/");
+    },
+    {
+      message: "URL must start with 'https://i.imgur.com/'",
+    }
+  ),
   description: z.string().trim().min(3).max(250),
 });
 
@@ -60,11 +68,13 @@ export function ProductForm({ product }: ProductFormProps) {
           name: product.name,
           category: product.category,
           price: product.price,
+          imageUrl: product.imageUrl,
           description: product.description,
         }
       : {
           name: "",
           description: "",
+          imageUrl: "",
         },
   });
 
@@ -153,6 +163,32 @@ export function ProductForm({ product }: ProductFormProps) {
                 />
               </FormControl>
 
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Imgur Image URL</FormLabel>
+
+              <FormControl>
+                <Input placeholder="https://i.imgur.com/..." {...field} />
+              </FormControl>
+
+              <FormDescription>
+                Upload your image{" "}
+                <a
+                  href="https://imgur.com/upload"
+                  target="_blank"
+                  className="underline"
+                >
+                  here
+                </a>
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

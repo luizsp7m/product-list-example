@@ -12,12 +12,10 @@ export async function upsertProduct(
     await db.product.upsert({
       create: {
         ...product,
-        imageUrl: "",
       },
 
       update: {
         ...product,
-        imageUrl: "",
       },
 
       where: {

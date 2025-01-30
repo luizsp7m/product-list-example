@@ -22,18 +22,17 @@ export function createProductColumns({
       header: "Product",
       cell: ({ row: { original: product } }) => (
         <div className="flex gap-2 items-center">
-          {/* <Image
-            src={
-              "https://i.imgur.com/3kCFN9v_d.webp?maxwidth=760&fidelity=grand"
-            }
-            alt="Product Image"
-            width={320}
-            height={320}
-            style={{ width: 48, height: 48 }}
-            className="rounded object-fill"
-          /> */}
-
-          <div className="h-[48px] w-[48px] rounded bg-secondary" />
+          <div className="relative w-[48px] h-[48px] bg-secondary overflow-hidden rounded">
+            <Image
+              src={product.imageUrl ?? ""}
+              alt={`${product.name} image`}
+              fill
+              sizes="100%"
+              style={{
+                objectFit: "contain",
+              }}
+            />
+          </div>
 
           <span className="block w-[256px] truncate">{product.name}</span>
         </div>
