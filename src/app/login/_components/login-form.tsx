@@ -1,7 +1,8 @@
 "use client";
 
-import { authenticate } from "@/actions/autenticate";
+import { authenticate } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
+
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
+import { AUTHENTICATED_ENTRY } from "@/constants/app-config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -27,10 +29,11 @@ import { z } from "zod";
 
 const loginFormSchema = z.object({
   email: z.string().email(),
-  password: z.string(),
+  password: z.string().min(3),
+  redirectTo: z.string(),
 });
 
-type LoginFormData = z.infer<typeof loginFormSchema>;
+export type LoginFormData = z.infer<typeof loginFormSchema>;
 
 export function LoginForm() {
   const form = useForm<LoginFormData>({
@@ -38,13 +41,13 @@ export function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
+      redirectTo: AUTHENTICATED_ENTRY,
     },
   });
 
   async function onSubmit(data: LoginFormData) {
     try {
-      const { email, password } = data;
-      await authenticate({ email, password });
+      await authenticate(data);
     } catch (error) {
       console.log(error);
     }
@@ -87,6 +90,21 @@ export function LoginForm() {
 
                   <FormControl>
                     <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="redirectTo"
+              render={({ field }) => (
+                <FormItem hidden>
+                  <FormLabel>Password</FormLabel>
+
+                  <FormControl>
+                    <Input type="text" disabled {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
