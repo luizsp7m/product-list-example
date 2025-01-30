@@ -13,7 +13,7 @@ model Product {
   category    ProductCategory
   price       Decimal         @db.Decimal(10, 2)
   description String
-  image       String
+  imageUrl    String
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 

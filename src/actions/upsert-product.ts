@@ -5,12 +5,23 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function createProduct(product: ProductFormData) {
+export async function upsertProduct(
+  product: ProductFormData & { id?: string }
+) {
   try {
-    await db.product.create({
-      data: {
+    await db.product.upsert({
+      create: {
         ...product,
-        image: "",
+        imageUrl: "",
+      },
+
+      update: {
+        ...product,
+        imageUrl: "",
+      },
+
+      where: {
+        id: product.id ?? "",
       },
     });
 

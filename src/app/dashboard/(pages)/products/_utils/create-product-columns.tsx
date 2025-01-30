@@ -1,4 +1,6 @@
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+import { Button, buttonVariants } from "@/components/ui/button";
 import { PRODUCT_CATEGORY_LABELS } from "@/constants/product-categories";
 import { Product } from "@/types/product";
 import { currencyFormatter } from "@/utils/currency-formatter";
@@ -6,7 +8,13 @@ import { dateFormatter } from "@/utils/date-formatter";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pen, Trash } from "lucide-react";
 
-export function createProductColumns(): ColumnDef<Product>[] {
+interface CreateProductColumnsProps {
+  handleOpenDeleteProductAlert: (product: Product) => void;
+}
+
+export function createProductColumns({
+  handleOpenDeleteProductAlert,
+}: CreateProductColumnsProps): ColumnDef<Product>[] {
   return [
     {
       accessorKey: "name",
@@ -48,18 +56,20 @@ export function createProductColumns(): ColumnDef<Product>[] {
       cell: ({ row: { original: product } }) => {
         return (
           <div className="flex items-center gap-2">
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => alert(product.id)}
+            <Link
+              href={`/dashboard/products/update/${product.id}`}
+              className={buttonVariants({
+                size: "icon",
+                variant: "outline",
+              })}
             >
               <Pen />
-            </Button>
+            </Link>
 
             <Button
               size="icon"
               variant="outline"
-              onClick={() => alert(product.id)}
+              onClick={() => handleOpenDeleteProductAlert(product)}
             >
               <Trash />
             </Button>

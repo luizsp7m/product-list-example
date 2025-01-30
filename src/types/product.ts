@@ -6,7 +6,7 @@ export type Product = {
   category: (typeof PRODUCT_CATEGORIES)[keyof typeof PRODUCT_CATEGORIES];
   price: number;
   description: string;
-  image: string;
+  imageUrl: string;
   createdAt: string;
   updatedAt: string;
 };

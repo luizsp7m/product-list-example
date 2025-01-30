@@ -35,8 +35,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { createProduct } from "@/actions/create-product";
 import { Loader2 } from "lucide-react";
+import { upsertProduct } from "@/actions/upsert-product";
+import { Product } from "@/types/product";
 
 const productFormSchema = z.object({
   name: z.string().trim().min(3).max(50),
@@ -47,18 +48,33 @@ const productFormSchema = z.object({
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
 
-export function ProductForm() {
+interface ProductFormProps {
+  product?: Product;
+}
+
+export function ProductForm({ product }: ProductFormProps) {
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-    },
+    defaultValues: product
+      ? {
+          name: product.name,
+          category: product.category,
+          price: product.price,
+          description: product.description,
+        }
+      : {
+          name: "",
+          description: "",
+        },
   });
 
   async function onSubmit(data: ProductFormData) {
     try {
-      await createProduct(data);
+      if (product) {
+        await upsertProduct({ id: product.id, ...data });
+      } else {
+        await upsertProduct(data);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -172,7 +188,8 @@ export function ProductForm() {
             {form.formState.isSubmitting && (
               <Loader2 className="animate-spin" />
             )}
-            Create
+
+            {product ? "Update" : "Create"}
           </Button>
         </div>
       </form>

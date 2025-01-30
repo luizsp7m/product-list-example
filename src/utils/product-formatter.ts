@@ -1,7 +1,7 @@
 import { Product } from "@/types/product";
 import { Product as ProductPrisma } from "@prisma/client";
 
-export function ProductFormatter(product: ProductPrisma): Product {
+export function productFormatter(product: ProductPrisma): Product {
   return {
     ...product,
     price: parseFloat(product.price as unknown as string),
