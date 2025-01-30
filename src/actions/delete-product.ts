@@ -11,7 +11,7 @@ export async function deleteProduct(productId: string) {
       },
     });
 
-    revalidatePath("/dashboard/products");
+    revalidatePath("/products");
   } catch (error) {
     throw error;
   }

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
+import { PRODUCT_CATEGORY_OPTIONS } from "@/constants/product-categories";
 
 const ITEMS_PER_PAGE = [10, 20, 30];
 
@@ -34,10 +35,14 @@ const toolbarSchema = z.object({
 type ToolbarSchemaData = z.infer<typeof toolbarSchema>;
 
 export function Toolbar() {
-  const { search, perPage, orderBy } = useSearchParamsValues();
+  const { search, perPage, orderBy, category } = useSearchParamsValues();
 
-  const { handleSearch, handleChangePerPage, handleChangeOrderBy } =
-    useUpdateSearchParams();
+  const {
+    handleSearch,
+    handleChangePerPage,
+    handleChangeOrderBy,
+    handleChangeCategory,
+  } = useUpdateSearchParams();
 
   const form = useForm<ToolbarSchemaData>({
     resolver: zodResolver(toolbarSchema),
@@ -105,6 +110,29 @@ export function Toolbar() {
               {PRODUCTS_ORDER_BY_OPTIONS.map((option, index) => (
                 <SelectItem key={index} value={option.value}>
                   {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="md:flex-1">
+          <Select
+            onValueChange={(newCategory) => handleChangeCategory(newCategory)}
+            defaultValue={String(
+              PRODUCT_CATEGORY_OPTIONS.find(
+                (option) => option.value === category
+              )?.value || ""
+            )}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {PRODUCT_CATEGORY_OPTIONS.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
                 </SelectItem>
               ))}
             </SelectContent>

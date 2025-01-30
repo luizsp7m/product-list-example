@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { PRODUCT_CATEGORY_LABELS } from "@/constants/product-categories";
@@ -22,11 +21,10 @@ export function createProductColumns({
       header: "Product",
       cell: ({ row: { original: product } }) => (
         <div className="flex gap-2 items-center">
-          <div className="relative w-[48px] h-[48px] bg-secondary overflow-hidden rounded">
-            <Image
+          <div className="relative flex justify-center items-center w-[48px] h-[48px] bg-secondary overflow-hidden rounded">
+            <img
               src={product.imageUrl ?? ""}
               alt={`${product.name} image`}
-              fill
               sizes="100%"
               style={{
                 objectFit: "contain",
@@ -72,7 +70,7 @@ export function createProductColumns({
         return (
           <div className="flex items-center gap-2">
             <Link
-              href={`/dashboard/products/update/${product.id}`}
+              href={`/products/update/${product.id}`}
               className={buttonVariants({
                 size: "icon",
                 variant: "outline",

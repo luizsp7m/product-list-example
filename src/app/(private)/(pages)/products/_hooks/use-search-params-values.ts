@@ -8,11 +8,13 @@ export function useSearchParamsValues() {
   const page = searchParams.get(PRODUCT_SEARCH_PARAMS.PAGE) || "";
   const orderBy = searchParams.get(PRODUCT_SEARCH_PARAMS.ORDER_BY) || "";
   const perPage = searchParams.get(PRODUCT_SEARCH_PARAMS.PER_PAGE) || "";
+  const category = searchParams.get(PRODUCT_SEARCH_PARAMS.CATEGORY) || "";
 
   return {
     search,
     page,
     orderBy,
     perPage,
+    category,
   };
 }

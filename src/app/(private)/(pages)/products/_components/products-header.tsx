@@ -9,7 +9,7 @@ export function ProductsHeader() {
       <h5 className="text-sm">Products</h5>
 
       <Link
-        href={"/dashboard/products/create"}
+        href={"/products/create"}
         className={buttonVariants({ variant: "default" })}
       >
         <Plus />

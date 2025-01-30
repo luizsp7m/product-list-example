@@ -1,6 +1,5 @@
 import { LogoutButton } from "./logout-button";
 import { ModeToggle } from "./mode-toggle";
-import { NavItems } from "./nav-items";
 
 export function AppHeader() {
   return (
@@ -8,7 +7,6 @@ export function AppHeader() {
       <div className="container flex items-center justify-between mx-auto px-4 h-[64px]">
         <div className="flex items-center gap-8">
           <h1>Logo</h1>
-          <NavItems />
         </div>
 
         <div className="flex items-center gap-2">

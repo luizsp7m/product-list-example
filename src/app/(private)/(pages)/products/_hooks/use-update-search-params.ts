@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export function useUpdateSearchParams() {
   const router = useRouter();
 
-  const { search, page, orderBy, perPage } = useSearchParamsValues();
+  const { search, page, orderBy, perPage, category } = useSearchParamsValues();
 
   function updateParams(overrides: Partial<Record<string, string | number>>) {
     const params = new URLSearchParams();
@@ -14,6 +14,7 @@ export function useUpdateSearchParams() {
     if (orderBy) params.set(PRODUCT_SEARCH_PARAMS.ORDER_BY, String(orderBy));
     if (perPage) params.set(PRODUCT_SEARCH_PARAMS.PER_PAGE, String(perPage));
     if (page) params.set(PRODUCT_SEARCH_PARAMS.PAGE, String(page));
+    if (category) params.set(PRODUCT_SEARCH_PARAMS.CATEGORY, String(category));
 
     Object.entries(overrides).forEach(([key, value]) => {
       if (value === undefined || value === null) {
@@ -64,10 +65,20 @@ export function useUpdateSearchParams() {
     pushParams(params);
   };
 
+  const handleChangeCategory = (newCategory: string) => {
+    const params = updateParams({
+      [PRODUCT_SEARCH_PARAMS.CATEGORY]: newCategory,
+      [PRODUCT_SEARCH_PARAMS.PAGE]: 1,
+    });
+
+    pushParams(params);
+  };
+
   return {
     handleSearch,
     handleChangeOrderBy,
     handleChangePerPage,
     handleChangePage,
+    handleChangeCategory,
   };
 }

@@ -3,4 +3,5 @@ export const PRODUCT_SEARCH_PARAMS = {
   PAGE: "page",
   PER_PAGE: "perPage",
   ORDER_BY: "orderBy",
+  CATEGORY: "category",
 };

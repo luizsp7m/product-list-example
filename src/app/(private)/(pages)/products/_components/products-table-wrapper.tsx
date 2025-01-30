@@ -8,6 +8,7 @@ interface ProductsTableWrapperProps {
     orderBy: string;
     perPage: number;
     page: number;
+    category: string;
   };
 }
 
@@ -19,6 +20,7 @@ export async function ProductsTableWrapper({
     page: searchParams.page,
     perPage: searchParams.perPage,
     search: searchParams.search,
+    category: searchParams.category,
   });
 
   return (

@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { productFormatter } from "@/utils/product-formatter";
+import { Product } from "@prisma/client";
 import { z } from "zod";
 
 const searchParamsSchema = z.object({
@@ -9,6 +10,7 @@ const searchParamsSchema = z.object({
   orderBy: z.string().trim(),
   page: z.coerce.number().int().min(1),
   perPage: z.coerce.number().int().min(1).max(50),
+  category: z.string().trim(),
 });
 
 export async function getProducts(props: {
@@ -16,6 +18,7 @@ export async function getProducts(props: {
   orderBy: string;
   page: number;
   perPage: number;
+  category: string;
 }) {
   try {
     const validation = searchParamsSchema.safeParse({
@@ -23,6 +26,7 @@ export async function getProducts(props: {
       orderBy: props.orderBy,
       page: props.page,
       perPage: props.perPage,
+      category: props.category,
     });
 
     if (!validation.success) {
@@ -30,7 +34,7 @@ export async function getProducts(props: {
     }
 
     const {
-      data: { search, orderBy, perPage, page },
+      data: { search, orderBy, perPage, page, category },
     } = validation;
 
     const skip = (page - 1) * perPage;
@@ -41,6 +45,12 @@ export async function getProducts(props: {
           name: {
             contains: search,
             mode: "insensitive",
+          },
+        }),
+
+        ...(category && {
+          category: {
+            equals: category as Product["category"],
           },
         }),
       },
@@ -54,6 +64,12 @@ export async function getProducts(props: {
           name: {
             contains: search,
             mode: "insensitive",
+          },
+        }),
+
+        ...(category && {
+          category: {
+            equals: category as Product["category"],
           },
         }),
       },

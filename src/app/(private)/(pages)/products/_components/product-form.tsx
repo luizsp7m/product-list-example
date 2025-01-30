@@ -40,18 +40,11 @@ import { upsertProduct } from "@/actions/upsert-product";
 import { Product } from "@/types/product";
 
 const productFormSchema = z.object({
-  name: z.string().trim().min(3).max(50),
+  name: z.string().trim().min(3).max(256),
   category: z.nativeEnum(PRODUCT_CATEGORIES),
   price: z.number().positive(),
-  imageUrl: z.string().refine(
-    (value) => {
-      return value.startsWith("https://i.imgur.com/");
-    },
-    {
-      message: "URL must start with 'https://i.imgur.com/'",
-    }
-  ),
-  description: z.string().trim().min(3).max(250),
+  imageUrl: z.string().trim().min(3),
+  description: z.string().trim().min(3).max(256),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
@@ -216,7 +209,7 @@ export function ProductForm({ product }: ProductFormProps) {
 
         <div className="flex justify-end gap-3">
           <Link
-            href={"/dashboard/products"}
+            href={"/products"}
             className={buttonVariants({ variant: "outline" })}
           >
             Cancel

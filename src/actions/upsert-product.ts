@@ -1,6 +1,6 @@
 "use server";
 
-import { ProductFormData } from "@/app/dashboard/(pages)/products/_components/product-form";
+import { ProductFormData } from "@/app/(private)/(pages)/products/_components/product-form";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -23,8 +23,8 @@ export async function upsertProduct(
       },
     });
 
-    revalidatePath("/dashboard/products");
-    redirect("/dashboard/products");
+    revalidatePath("/products");
+    redirect("/products");
   } catch (error) {
     throw error;
   }
