@@ -31,6 +31,11 @@ export function useUpdateSearchParams() {
     router.replace(`?${params.toString()}`);
   }
 
+  const handleResetParams = () => {
+    const params = new URLSearchParams();
+    pushParams(params);
+  };
+
   const handleSearch = (newSearch?: string) => {
     const params = updateParams({
       [PRODUCT_SEARCH_PARAMS.SEARCH]: newSearch,
@@ -80,5 +85,6 @@ export function useUpdateSearchParams() {
     handleChangePerPage,
     handleChangePage,
     handleChangeCategory,
+    handleResetParams,
   };
 }
