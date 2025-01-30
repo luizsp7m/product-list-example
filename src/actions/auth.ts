@@ -1,13 +1,19 @@
 "use server";
 
 import { signIn, signOut } from "@/lib/auth";
-import { UNAUTHENTICATED_ENTRY } from "@/constants/app-config";
+
+import {
+  AUTHENTICATED_ENTRY,
+  UNAUTHENTICATED_ENTRY,
+} from "@/constants/app-config";
+
 import { LoginFormData } from "@/app/login/_components/login-form";
 
 export async function signInWithCredentials(credentials: LoginFormData) {
   try {
     await signIn("credentials", {
-      redirect: false,
+      redirect: true,
+      redirectTo: AUTHENTICATED_ENTRY,
       email: credentials.email,
       password: credentials.password,
     });

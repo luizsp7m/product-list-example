@@ -21,32 +21,24 @@ import {
 } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
-import { AUTHENTICATED_ENTRY } from "@/constants/app-config";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const loginFormSchema = z.object({
   email: z.string().email(),
   password: z.string().min(3),
-  redirectTo: z.string(),
 });
 
 export type LoginFormData = z.infer<typeof loginFormSchema>;
 
 export function LoginForm() {
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || AUTHENTICATED_ENTRY;
-
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: "",
       password: "",
-      redirectTo: callbackUrl,
     },
   });
 
@@ -95,21 +87,6 @@ export function LoginForm() {
 
                   <FormControl>
                     <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="redirectTo"
-              render={({ field }) => (
-                <FormItem hidden>
-                  <FormLabel>Password</FormLabel>
-
-                  <FormControl>
-                    <Input type="text" disabled {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

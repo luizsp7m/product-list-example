@@ -5,8 +5,6 @@ import {
   UNAUTHENTICATED_ENTRY,
 } from "./constants/app-config";
 
-import { USER_ROLES } from "./constants/user-roles";
-
 export const authConfig = {
   pages: {
     signIn: UNAUTHENTICATED_ENTRY,
@@ -35,15 +33,8 @@ export const authConfig = {
       const isOnDashboard = nextUrl.pathname.startsWith(AUTHENTICATED_ENTRY);
       const isLoginRoute = nextUrl.pathname === UNAUTHENTICATED_ENTRY;
 
-      const userRole = auth?.user.role;
-      const isAdmin = userRole === USER_ROLES.ADMIN;
-
       if (isOnDashboard && !isLoggedIn) {
         return false;
-      }
-
-      if (isOnDashboard && isLoggedIn && !isAdmin) {
-        return Response.redirect(new URL("/", nextUrl));
       }
 
       if (isLoginRoute && isLoggedIn) {
