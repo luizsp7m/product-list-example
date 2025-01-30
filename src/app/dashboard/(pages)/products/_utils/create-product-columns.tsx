@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { PRODUCT_CATEGORY_LABELS } from "@/constants/product-categories";
@@ -20,7 +21,22 @@ export function createProductColumns({
       accessorKey: "name",
       header: "Product",
       cell: ({ row: { original: product } }) => (
-        <span className="block w-[256px] truncate">{product.name}</span>
+        <div className="flex gap-2 items-center">
+          {/* <Image
+            src={
+              "https://i.imgur.com/3kCFN9v_d.webp?maxwidth=760&fidelity=grand"
+            }
+            alt="Product Image"
+            width={320}
+            height={320}
+            style={{ width: 48, height: 48 }}
+            className="rounded object-fill"
+          /> */}
+
+          <div className="h-[48px] w-[48px] rounded bg-secondary" />
+
+          <span className="block w-[256px] truncate">{product.name}</span>
+        </div>
       ),
     },
 

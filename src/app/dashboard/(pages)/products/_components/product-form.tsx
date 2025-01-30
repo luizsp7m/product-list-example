@@ -86,7 +86,9 @@ export function ProductForm({ product }: ProductFormProps) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-3 max-w-[768px] mx-auto"
       >
-        <h5 className="text-muted-foreground">Create product</h5>
+        <h5 className="text-muted-foreground">
+          {product ? "Update product" : "Create product"}
+        </h5>
 
         <FormField
           control={form.control}
