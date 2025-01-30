@@ -2,22 +2,16 @@
 
 import { signIn, signOut } from "@/lib/auth";
 import { UNAUTHENTICATED_ENTRY } from "@/constants/app-config";
-
 import { LoginFormData } from "@/app/login/_components/login-form";
-import { AuthError } from "next-auth";
 
-export async function authenticate(credentials: LoginFormData) {
+export async function signInWithCredentials(credentials: LoginFormData) {
   try {
-    await signIn("credentials", credentials);
+    await signIn("credentials", {
+      redirect: false,
+      email: credentials.email,
+      password: credentials.password,
+    });
   } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          throw new Error("Invalid credentials");
-        default:
-          throw new Error("Something went wrong");
-      }
-    }
     throw error;
   }
 }

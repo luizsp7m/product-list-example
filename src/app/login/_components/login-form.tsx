@@ -1,6 +1,6 @@
 "use client";
 
-import { authenticate } from "@/actions/auth";
+import { signInWithCredentials } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -22,8 +22,10 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { AUTHENTICATED_ENTRY } from "@/constants/app-config";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -36,18 +38,21 @@ const loginFormSchema = z.object({
 export type LoginFormData = z.infer<typeof loginFormSchema>;
 
 export function LoginForm() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || AUTHENTICATED_ENTRY;
+
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: "",
       password: "",
-      redirectTo: AUTHENTICATED_ENTRY,
+      redirectTo: callbackUrl,
     },
   });
 
   async function onSubmit(data: LoginFormData) {
     try {
-      await authenticate(data);
+      await signInWithCredentials(data);
     } catch (error) {
       console.log(error);
     }
