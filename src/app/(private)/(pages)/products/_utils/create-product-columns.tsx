@@ -29,7 +29,9 @@ export function createProductColumns({
               fill
               sizes="100%"
               style={{
-                objectFit: "contain",
+                objectFit: "cover",
+                width: "100%",
+                height: "100%",
               }}
             />
           </div>
