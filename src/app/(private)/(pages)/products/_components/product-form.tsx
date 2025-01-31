@@ -97,6 +97,11 @@ export function ProductForm({ product }: ProductFormProps) {
   });
 
   async function onSubmit(data: ProductFormData) {
+    if (!imagePreview && !imageFile) {
+      form.setError("imageFile", { message: "Required" });
+      return;
+    }
+
     let imageUrl = product?.imageUrl || "";
 
     try {
@@ -226,26 +231,35 @@ export function ProductForm({ product }: ProductFormProps) {
               <FormLabel>Image</FormLabel>
 
               {imagePreview ? (
-                <div className="relative w-full h-40 overflow-hidden">
-                  <Image
-                    src={imagePreview}
-                    alt={"Product image"}
-                    fill
-                    sizes="100%"
-                    className="rounded-lg"
-                    style={{
-                      objectFit: "cover",
-                    }}
-                  />
+                <div
+                  className="relative w-full h-44 bg-secondary bg-cover bg-center flex items-center justify-center rounded-md overflow-hidden"
+                  style={{
+                    backgroundImage: `url(${imagePreview})`,
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/30 backdrop-blur-md rounded-md" />
 
-                  <Button
-                    variant="destructive"
-                    className="absolute top-1 right-1 text-xs"
-                    onClick={removeImage}
-                    type="button"
-                  >
-                    Remove
-                  </Button>
+                  <div className="relative z-10 w-full h-44 overflow-hidden">
+                    <Image
+                      src={imagePreview}
+                      alt={"Product image"}
+                      fill
+                      sizes="100%"
+                      className="rounded-md"
+                      style={{
+                        objectFit: "contain",
+                      }}
+                    />
+
+                    <Button
+                      variant="destructive"
+                      className="absolute top-2 right-2 text-xs"
+                      onClick={removeImage}
+                      type="button"
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <FormControl>

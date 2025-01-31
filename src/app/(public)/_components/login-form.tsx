@@ -54,6 +54,7 @@ export function LoginForm() {
       await signInWithCredentials(data);
     } catch (error) {
       console.log(error);
+      form.setError("root", { message: "Invalid credentials" });
     }
   }
 
@@ -68,6 +69,12 @@ export function LoginForm() {
       </CardHeader>
 
       <CardContent>
+        {form.formState.errors.root && (
+          <p className="text-[0.8rem] font-medium text-destructive mb-3 bg-red-200 p-3 rounded">
+            {form.formState.errors.root?.message}
+          </p>
+        )}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -80,6 +87,7 @@ export function LoginForm() {
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -95,6 +103,7 @@ export function LoginForm() {
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
