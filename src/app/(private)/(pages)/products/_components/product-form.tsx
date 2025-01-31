@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,13 +39,33 @@ import {
 import { Loader2 } from "lucide-react";
 import { upsertProduct } from "@/actions/upsert-product";
 import { Product } from "@/types/product";
+import { useState } from "react";
+import { uploadImage } from "@/services/upload-image";
 
 const productFormSchema = z.object({
   name: z.string().trim().min(3).max(256),
   category: z.nativeEnum(PRODUCT_CATEGORIES),
   price: z.number().positive(),
-  imageUrl: z.string().trim().min(3),
   description: z.string().trim().min(3).max(256),
+
+  imageFile:
+    typeof window !== "undefined" && "FileList" in window
+      ? z
+          .instanceof(FileList)
+          .optional()
+          .refine(
+            (files) =>
+              !files || files.length === 0 || files[0]?.size <= 2 * 1024 * 1024, // Máx. 2MB
+            "The file must be a maximum of 2MB"
+          )
+          .refine(
+            (files) =>
+              !files ||
+              files.length === 0 ||
+              ["image/png", "image/jpeg", "image/jpg"].includes(files[0]?.type),
+            "Only PNG, JPG and JPEG files are allowed"
+          )
+      : z.any(),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
@@ -54,6 +75,12 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ product }: ProductFormProps) {
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    product?.imageUrl || null
+  );
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
     defaultValues: product
@@ -61,27 +88,57 @@ export function ProductForm({ product }: ProductFormProps) {
           name: product.name,
           category: product.category,
           price: product.price,
-          imageUrl: product.imageUrl,
           description: product.description,
         }
       : {
           name: "",
           description: "",
-          imageUrl: "",
         },
   });
 
   async function onSubmit(data: ProductFormData) {
+    let imageUrl = product?.imageUrl || "";
+
     try {
-      if (product) {
-        await upsertProduct({ id: product.id, ...data });
-      } else {
-        await upsertProduct(data);
+      if (imageFile) {
+        const imageUploadedUrl = await uploadImage(imageFile);
+        imageUrl = imageUploadedUrl;
       }
+
+      await upsertProduct({
+        id: product?.id,
+        name: data.name,
+        category: data.category,
+        description: data.description,
+        imageUrl,
+        price: data.price,
+      });
     } catch (error) {
       console.log(error);
     }
   }
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+
+    if (selectedFile) {
+      setImageFile(selectedFile);
+      form.setValue("imageFile", event.target.files!, { shouldValidate: true });
+
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    setImageFile(null);
+
+    form.setValue("imageFile", new DataTransfer().files, {
+      shouldValidate: true,
+    });
+  };
 
   return (
     <Form {...form}>
@@ -163,25 +220,43 @@ export function ProductForm({ product }: ProductFormProps) {
 
         <FormField
           control={form.control}
-          name="imageUrl"
-          render={({ field }) => (
+          name="imageFile"
+          render={() => (
             <FormItem>
-              <FormLabel>Imgur Image URL</FormLabel>
+              <FormLabel>Image</FormLabel>
 
-              <FormControl>
-                <Input placeholder="https://i.imgur.com/..." {...field} />
-              </FormControl>
+              {imagePreview ? (
+                <div className="relative w-full h-40 overflow-hidden">
+                  <Image
+                    src={imagePreview}
+                    alt={"Product image"}
+                    fill
+                    sizes="100%"
+                    className="rounded-lg"
+                    style={{
+                      objectFit: "cover",
+                    }}
+                  />
 
-              <FormDescription>
-                Upload your image{" "}
-                <a
-                  href="https://imgur.com/upload"
-                  target="_blank"
-                  className="underline"
-                >
-                  here
-                </a>
-              </FormDescription>
+                  <Button
+                    variant="destructive"
+                    className="absolute top-1 right-1 text-xs"
+                    onClick={removeImage}
+                    type="button"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </FormControl>
+              )}
+
               <FormMessage />
             </FormItem>
           )}

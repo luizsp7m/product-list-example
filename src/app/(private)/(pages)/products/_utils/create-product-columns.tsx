@@ -7,6 +7,7 @@ import { currencyFormatter } from "@/utils/currency-formatter";
 import { dateFormatter } from "@/utils/date-formatter";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pen, Trash } from "lucide-react";
+import Image from "next/image";
 
 interface CreateProductColumnsProps {
   handleOpenDeleteProductAlert: (product: Product) => void;
@@ -22,9 +23,10 @@ export function createProductColumns({
       cell: ({ row: { original: product } }) => (
         <div className="flex gap-2 items-center">
           <div className="relative flex justify-center items-center w-[48px] h-[48px] bg-secondary overflow-hidden rounded">
-            <img
-              src={product.imageUrl ?? ""}
+            <Image
+              src={product.imageUrl}
               alt={`${product.name} image`}
+              fill
               sizes="100%"
               style={{
                 objectFit: "contain",
