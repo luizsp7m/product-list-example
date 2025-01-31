@@ -4,8 +4,8 @@ import { ThemeProvider } from "@/components/provider-components/theme-provider";
 
 export const metadata: Metadata = {
   title: {
-    template: "% - | eCommerce",
-    default: "eCommerce",
+    template: "%s - Product List Example",
+    default: "Product List Example",
   },
 };
 
