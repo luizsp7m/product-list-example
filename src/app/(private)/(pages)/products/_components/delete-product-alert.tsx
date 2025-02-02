@@ -1,5 +1,4 @@
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
 
 import {
   AlertDialog,
@@ -13,7 +12,9 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Product } from "@/types/product";
-import { deleteProduct } from "@/actions/delete-product";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteProduct } from "@/services/delete-product";
+import { useToast } from "@/hooks/use-toast";
 
 interface DeleteProductAlertProps {
   isOpen: boolean;
@@ -26,20 +27,32 @@ export function DeleteProductAlert({
   selectedProduct,
   handleCloseDeleteProductAlert,
 }: DeleteProductAlertProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const queryClient = useQueryClient();
 
-  async function handleDeleteProduct() {
-    if (!selectedProduct) return;
+  const { toast } = useToast();
 
-    try {
-      setIsDeleting(true);
-      await deleteProduct(selectedProduct.id);
+  const mutation = useMutation({
+    mutationFn: (productId: string) => deleteProduct(productId),
+    onSuccess: () => {
       handleCloseDeleteProductAlert();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsDeleting(false);
-    }
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast({
+        description: "Product deleted successfully!",
+      });
+    },
+
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "There was a problem with your request.",
+      });
+    },
+  });
+
+  function handleDeleteProduct() {
+    if (!selectedProduct) return;
+    mutation.mutate(selectedProduct.id);
   }
 
   return (
@@ -64,8 +77,8 @@ export function DeleteProductAlert({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-          <Button onClick={handleDeleteProduct} disabled={isDeleting}>
-            {isDeleting && <Loader2 className="animate-spin" />}
+          <Button onClick={handleDeleteProduct} disabled={mutation.isPending}>
+            {mutation.isPending && <Loader2 className="animate-spin" />}
             Continue
           </Button>
         </AlertDialogFooter>

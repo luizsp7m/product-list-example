@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
           message: "Validation error",
           error: searchParamsValidation.error,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -81,12 +81,12 @@ export async function GET(request: NextRequest) {
         numberPages,
         total: totalCount,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return NextResponse.json(
       { message: "Internal server error", error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -102,6 +102,7 @@ export const POST = auth(async function POST(request) {
     const body = await request.json();
 
     const productDataValidation = productDataSchema.safeParse({
+      id: body.id,
       name: body.name,
       category: body.category,
       price: body.price,
@@ -119,16 +120,16 @@ export const POST = auth(async function POST(request) {
       create: { ...productData },
       update: { ...productData },
       where: {
-        id: productData.id,
+        id: productData.id ?? "",
       },
     });
 
     return NextResponse.json(
       {
-        message: "Product created successfully",
+        message: `Product ${productData.id ? "updated" : "created"} successfully`,
         product,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     return InternalServerError(error);

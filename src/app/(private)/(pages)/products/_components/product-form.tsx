@@ -20,10 +20,7 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import {
-  PRODUCT_CATEGORIES,
-  PRODUCT_CATEGORY_OPTIONS,
-} from "@/constants/product-categories";
+import { PRODUCT_CATEGORY_OPTIONS } from "@/constants/product-categories";
 
 import { Textarea } from "@/components/ui/textarea";
 import { MoneyInput } from "@/components/shared-components/money-input";
@@ -37,36 +34,14 @@ import {
 } from "@/components/ui/select";
 
 import { Loader2 } from "lucide-react";
-import { upsertProduct } from "@/actions/upsert-product";
 import { Product } from "@/types/product";
 import { useState } from "react";
 import { uploadImage } from "@/services/upload-image";
-
-const productFormSchema = z.object({
-  name: z.string().trim().min(3).max(256),
-  category: z.nativeEnum(PRODUCT_CATEGORIES),
-  price: z.number().positive(),
-  description: z.string().trim().min(3).max(256),
-
-  imageFile:
-    typeof window !== "undefined" && "FileList" in window
-      ? z
-          .instanceof(FileList)
-          .optional()
-          .refine(
-            (files) =>
-              !files || files.length === 0 || files[0]?.size <= 2 * 1024 * 1024, // Máx. 2MB
-            "The file must be a maximum of 2MB"
-          )
-          .refine(
-            (files) =>
-              !files ||
-              files.length === 0 ||
-              ["image/png", "image/jpeg", "image/jpg"].includes(files[0]?.type),
-            "Only PNG, JPG and JPEG files are allowed"
-          )
-      : z.any(),
-});
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { upsertProduct, UpsertProductData } from "@/services/upsert-product";
+import { useRouter } from "next/navigation";
+import { productFormSchema } from "../_schemas/product-form-schema";
+import { useToast } from "@/hooks/use-toast";
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
 
@@ -75,11 +50,17 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ product }: ProductFormProps) {
+  const { toast } = useToast();
+
   const [imagePreview, setImagePreview] = useState<string | null>(
-    product?.imageUrl || null
+    product?.imageUrl || null,
   );
 
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const router = useRouter();
+
+  const queryClient = useQueryClient();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
@@ -96,6 +77,10 @@ export function ProductForm({ product }: ProductFormProps) {
         },
   });
 
+  const mutation = useMutation({
+    mutationFn: (data: UpsertProductData) => upsertProduct(data),
+  });
+
   async function onSubmit(data: ProductFormData) {
     if (!imagePreview && !imageFile) {
       form.setError("imageFile", { message: "Required" });
@@ -104,13 +89,22 @@ export function ProductForm({ product }: ProductFormProps) {
 
     let imageUrl = product?.imageUrl || "";
 
-    try {
-      if (imageFile) {
-        const imageUploadedUrl = await uploadImage(imageFile);
-        imageUrl = imageUploadedUrl;
-      }
+    if (imageFile) {
+      try {
+        imageUrl = await uploadImage(imageFile);
+      } catch (error) {
+        console.error("Error uploading image:", error);
 
-      await upsertProduct({
+        form.setError("imageFile", {
+          message: "Failed to upload image. Try again.",
+        });
+
+        return;
+      }
+    }
+
+    try {
+      await mutation.mutateAsync({
         id: product?.id,
         name: data.name,
         category: data.category,
@@ -118,8 +112,23 @@ export function ProductForm({ product }: ProductFormProps) {
         imageUrl,
         price: data.price,
       });
+
+      toast({
+        description: product
+          ? "Product updated successfully!"
+          : "Product created successfully!",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      router.push("/products");
     } catch (error) {
-      console.log(error);
+      console.error("Error saving product:", error);
+
+      toast({
+        variant: "destructive",
+        title: "Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     }
   }
 
@@ -149,7 +158,7 @@ export function ProductForm({ product }: ProductFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-3 max-w-[768px] mx-auto"
+        className="mx-auto max-w-[768px] space-y-3"
       >
         <h5 className="text-muted-foreground">
           {product ? "Update product" : "Create product"}
@@ -232,14 +241,14 @@ export function ProductForm({ product }: ProductFormProps) {
 
               {imagePreview ? (
                 <div
-                  className="relative w-full h-44 bg-secondary bg-cover bg-center flex items-center justify-center rounded-md overflow-hidden"
+                  className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-md bg-secondary bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${imagePreview})`,
                   }}
                 >
-                  <div className="absolute inset-0 bg-black/30 backdrop-blur-md rounded-md" />
+                  <div className="absolute inset-0 rounded-md bg-black/30 backdrop-blur-md" />
 
-                  <div className="relative z-10 w-full h-44 overflow-hidden">
+                  <div className="relative z-10 h-44 w-full overflow-hidden">
                     <Image
                       src={imagePreview}
                       alt={"Product image"}
@@ -253,7 +262,7 @@ export function ProductForm({ product }: ProductFormProps) {
 
                     <Button
                       variant="destructive"
-                      className="absolute top-2 right-2 text-xs"
+                      className="absolute right-2 top-2 text-xs"
                       onClick={removeImage}
                       type="button"
                     >

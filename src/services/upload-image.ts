@@ -9,7 +9,7 @@ export async function uploadImage(imageFile: File): Promise<string> {
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     const data = await response.json();

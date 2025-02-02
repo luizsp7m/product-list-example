@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/provider-components/theme-provider";
 import { QueryClientWrapper } from "@/components/provider-components/query-client-wrapper";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: {
@@ -26,6 +27,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryClientWrapper>{children}</QueryClientWrapper>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
