@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
 import "./globals.css";
+
+import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/provider-components/theme-provider";
+import { QueryClientWrapper } from "@/components/provider-components/query-client-wrapper";
 
 export const metadata: Metadata = {
   title: {
@@ -23,7 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <QueryClientWrapper>{children}</QueryClientWrapper>
         </ThemeProvider>
       </body>
     </html>

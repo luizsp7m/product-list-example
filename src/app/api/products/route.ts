@@ -101,7 +101,7 @@ export const POST = auth(async function POST(request) {
 
     const body = await request.json();
 
-    const productBodyValidation = productDataSchema.safeParse({
+    const productDataValidation = productDataSchema.safeParse({
       name: body.name,
       category: body.category,
       price: body.price,
@@ -109,11 +109,11 @@ export const POST = auth(async function POST(request) {
       imageUrl: body.imageUrl,
     });
 
-    if (!productBodyValidation.success) {
-      return ValidationError(productBodyValidation.error);
+    if (!productDataValidation.success) {
+      return ValidationError(productDataValidation.error);
     }
 
-    const productData = productBodyValidation.data;
+    const productData = productDataValidation.data;
 
     const product = await db.product.upsert({
       create: { ...productData },

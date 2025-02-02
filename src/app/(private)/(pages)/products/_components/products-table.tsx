@@ -1,42 +1,51 @@
 "use client";
 
 import { DataTable } from "@/components/ui/data-table";
-import { Product } from "@/types/product";
 import { createProductColumns } from "../_utils/create-product-columns";
-import { Fragment, useState } from "react";
 import { DeleteProductAlert } from "./delete-product-alert";
+import { Loading } from "@/components/shared-components/loading";
+import { TablePagination } from "./table-pagination";
+import { useGetProducts } from "../_hooks/use-get-products";
+import { useDeleteProductAlert } from "../_hooks/use-selected-product";
 
-interface ProductsTableProps {
-  products: Product[];
-}
+export function ProductsTable() {
+  const {
+    deleteProductAlertIsOpen,
+    selectedProduct,
+    handleOpenDeleteProductAlert,
+    handleCloseDeleteProductAlert,
+  } = useDeleteProductAlert();
 
-export function ProductsTable({ products }: ProductsTableProps) {
-  const [deleteProductAlertIsOpen, setDeleteProductAlertIsOpen] =
-    useState(false);
-
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  function handleOpenDeleteProductAlert(product: Product) {
-    setSelectedProduct(product);
-    setDeleteProductAlertIsOpen(true);
-  }
-
-  function handleCloseDeleteProductAlert() {
-    setDeleteProductAlertIsOpen(false);
-    setSelectedProduct(null);
-  }
+  const { productsResponse, isLoading, error } = useGetProducts();
 
   const columns = createProductColumns({ handleOpenDeleteProductAlert });
 
+  if (isLoading) return <Loading />;
+
+  if (error) {
+    return <span>Something went wrong!</span>;
+  }
+
+  if (!productsResponse) return null;
+
   return (
-    <Fragment>
-      <DataTable data={products} columns={columns} />
+    <div className="flex flex-col gap-2">
+      <span className="text-sm text-muted-foreground">
+        Products found: {productsResponse.total ?? 0}
+      </span>
+
+      <DataTable data={productsResponse.data} columns={columns} />
+
+      <TablePagination
+        currentPage={productsResponse.page}
+        numberPages={productsResponse.numberPages}
+      />
 
       <DeleteProductAlert
         isOpen={deleteProductAlertIsOpen}
         selectedProduct={selectedProduct}
         handleCloseDeleteProductAlert={handleCloseDeleteProductAlert}
       />
-    </Fragment>
+    </div>
   );
 }
