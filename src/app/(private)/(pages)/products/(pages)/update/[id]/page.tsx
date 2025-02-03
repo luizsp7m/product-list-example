@@ -1,4 +1,4 @@
-import { getProductById } from "@/actions/get-product-by-id";
+import { getProductById } from "@/services/get-product-by-id";
 import { ProductForm } from "../../../_components/product-form";
 import { Metadata } from "next";
 

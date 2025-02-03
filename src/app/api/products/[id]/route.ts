@@ -5,10 +5,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { UnauthenticatedError } from "../_errors/unauthenticated-error";
 import { NotFound } from "../_errors/not-found";
 import { InternalServerError } from "../_errors/server-error";
+import { productFormatter } from "@/utils/product-formatter";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const productId = params.id;
@@ -23,7 +24,7 @@ export async function GET(
       return NotFound("Product not found");
     }
 
-    return NextResponse.json({ product }, { status: 200 });
+    return NextResponse.json(productFormatter(product), { status: 200 });
   } catch (error) {
     return InternalServerError(error);
   }
@@ -47,7 +48,7 @@ export const DELETE = auth(async function DELETE(request, { params }) {
       {
         message: "Product deleted successfully!",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     if (
