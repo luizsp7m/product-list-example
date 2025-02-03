@@ -23,7 +23,11 @@ export function ProductsTable() {
   if (isLoading) return <Loading />;
 
   if (error) {
-    return <span>Something went wrong!</span>;
+    return (
+      <main className="flex h-full flex-col items-center justify-center">
+        <h2 className="text-center">Something went wrong!</h2>
+      </main>
+    );
   }
 
   if (!productsResponse) return null;
