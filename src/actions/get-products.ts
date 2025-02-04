@@ -2,92 +2,76 @@
 
 import { db } from "@/lib/db";
 import { productFormatter } from "@/utils/product-formatter";
-import { Product } from "@prisma/client";
-import { z } from "zod";
-
-const searchParamsSchema = z.object({
-  search: z.string().trim().toLowerCase(),
-  orderBy: z.string().trim(),
-  page: z.coerce.number().int().min(1),
-  perPage: z.coerce.number().int().min(1).max(50),
-  category: z.string().trim(),
-});
+import { Prisma } from "@prisma/client";
+import { getProductsSchema } from "./_schemas/get-products-schema";
 
 export async function getProducts(props: {
-  search: string;
-  orderBy: string;
-  page: number;
-  perPage: number;
-  category: string;
+  search?: string;
+  orderBy?: string;
+  page?: string;
+  perPage?: string;
+  category?: string;
 }) {
   try {
-    const validation = searchParamsSchema.safeParse({
+    const propsValidation = getProductsSchema.safeParse({
       search: props.search,
-      orderBy: props.orderBy,
-      page: props.page,
-      perPage: props.perPage,
+      page: props.page || 1,
+      perPage: props.perPage || 10,
       category: props.category,
+      orderBy: props.orderBy || "updatedAt:desc",
     });
 
-    if (!validation.success) {
-      throw new Error(JSON.stringify(validation.error.flatten().fieldErrors));
+    if (!propsValidation.success) {
+      throw new Error("Validation error");
     }
 
     const {
       data: { search, orderBy, perPage, page, category },
-    } = validation;
+    } = propsValidation;
+
+    const where: Prisma.ProductWhereInput = {
+      ...(search && {
+        name: {
+          contains: search,
+          mode: "insensitive",
+        },
+      }),
+
+      ...(category && {
+        category: {
+          equals: category,
+        },
+      }),
+    };
+
+    let productOrderBy = undefined;
+
+    if (orderBy) {
+      const [field, order] = orderBy.split(":") as [string, "asc" | "desc"];
+      productOrderBy = { [field]: order };
+    }
 
     const skip = (page - 1) * perPage;
 
-    const countProducts = await db.product.count({
-      where: {
-        ...(search && {
-          name: {
-            contains: search,
-            mode: "insensitive",
-          },
-        }),
+    const [totalCount, products] = await db.$transaction([
+      db.product.count({ where }),
 
-        ...(category && {
-          category: {
-            equals: category as Product["category"],
-          },
-        }),
-      },
-    });
+      db.product.findMany({
+        where,
+        skip,
+        take: perPage,
+        orderBy: productOrderBy,
+      }),
+    ]);
 
-    const [sortByField, sortByDirection] = orderBy.split(":");
-
-    const products = await db.product.findMany({
-      where: {
-        ...(search && {
-          name: {
-            contains: search,
-            mode: "insensitive",
-          },
-        }),
-
-        ...(category && {
-          category: {
-            equals: category as Product["category"],
-          },
-        }),
-      },
-
-      skip,
-      take: perPage,
-
-      orderBy: { [sortByField]: sortByDirection as "asc" | "desc" },
-    });
-
-    const numberPages = Math.ceil(countProducts / perPage);
+    const numberPages = Math.ceil(totalCount / perPage);
 
     return {
       data: products.map(productFormatter),
       page,
       perPage,
       numberPages,
-      total: countProducts,
+      total: totalCount,
     };
   } catch (error) {
     throw error;

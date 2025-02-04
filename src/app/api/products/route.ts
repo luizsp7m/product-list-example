@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       perPage: searchParams.get(PRODUCT_SEARCH_PARAMS.PER_PAGE) || 10,
       category: searchParams.get(PRODUCT_SEARCH_PARAMS.CATEGORY) || undefined,
       orderBy:
-        searchParams.get(PRODUCT_SEARCH_PARAMS.ORDER_BY) || "createdAt:desc",
+        searchParams.get(PRODUCT_SEARCH_PARAMS.ORDER_BY) || "updatedAt:desc",
     });
 
     if (!searchParamsValidation.success) {

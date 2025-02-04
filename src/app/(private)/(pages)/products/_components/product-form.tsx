@@ -37,11 +37,9 @@ import { Loader2 } from "lucide-react";
 import { Product } from "@/types/product";
 import { useState } from "react";
 import { uploadImage } from "@/services/upload-image";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { upsertProduct, UpsertProductData } from "@/services/upsert-product";
-import { useRouter } from "next/navigation";
 import { productFormSchema } from "../_schemas/product-form-schema";
 import { useToast } from "@/hooks/use-toast";
+import { upsertProduct } from "@/actions/upsert-product";
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
 
@@ -58,10 +56,6 @@ export function ProductForm({ product }: ProductFormProps) {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const router = useRouter();
-
-  const queryClient = useQueryClient();
-
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
     defaultValues: product
@@ -75,10 +69,6 @@ export function ProductForm({ product }: ProductFormProps) {
           name: "",
           description: "",
         },
-  });
-
-  const mutation = useMutation({
-    mutationFn: (data: UpsertProductData) => upsertProduct(data),
   });
 
   async function onSubmit(data: ProductFormData) {
@@ -104,7 +94,7 @@ export function ProductForm({ product }: ProductFormProps) {
     }
 
     try {
-      await mutation.mutateAsync({
+      await upsertProduct({
         id: product?.id,
         name: data.name,
         category: data.category,
@@ -118,12 +108,7 @@ export function ProductForm({ product }: ProductFormProps) {
           ? "Product updated successfully!"
           : "Product created successfully!",
       });
-
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      router.push("/products");
     } catch (error) {
-      console.error("Error saving product:", error);
-
       toast({
         variant: "destructive",
         title: "Something went wrong.",

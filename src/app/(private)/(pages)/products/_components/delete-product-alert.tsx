@@ -12,9 +12,9 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Product } from "@/types/product";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteProduct } from "@/services/delete-product";
 import { useToast } from "@/hooks/use-toast";
+import { useFormStatus } from "react-dom";
+import { deleteProduct } from "@/actions/delete-product";
 
 interface DeleteProductAlertProps {
   isOpen: boolean;
@@ -27,32 +27,26 @@ export function DeleteProductAlert({
   selectedProduct,
   handleCloseDeleteProductAlert,
 }: DeleteProductAlertProps) {
-  const queryClient = useQueryClient();
-
   const { toast } = useToast();
 
-  const mutation = useMutation({
-    mutationFn: (productId: string) => deleteProduct(productId),
-    onSuccess: () => {
+  async function handleDeleteProduct() {
+    if (!selectedProduct) return;
+
+    try {
+      await deleteProduct(selectedProduct.id);
+
       handleCloseDeleteProductAlert();
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+
       toast({
         description: "Product deleted successfully!",
       });
-    },
-
-    onError: () => {
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Something went wrong.",
         description: "There was a problem with your request.",
       });
-    },
-  });
-
-  function handleDeleteProduct() {
-    if (!selectedProduct) return;
-    mutation.mutate(selectedProduct.id);
+    }
   }
 
   return (
@@ -75,14 +69,24 @@ export function DeleteProductAlert({
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
 
-          <Button onClick={handleDeleteProduct} disabled={mutation.isPending}>
-            {mutation.isPending && <Loader2 className="animate-spin" />}
-            Continue
-          </Button>
+          <form action={handleDeleteProduct}>
+            <SubmitButton />
+          </form>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button disabled={pending} type="submit">
+      {pending && <Loader2 className="animate-spin" />}
+      Continue
+    </Button>
   );
 }
