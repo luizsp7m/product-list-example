@@ -29,10 +29,10 @@ export async function upsertProduct(product: ProductFormData) {
         id: product.id ?? "",
       },
     });
-
-    revalidatePath("/products");
-    redirect("/products");
   } catch (error) {
     throw error;
   }
+
+  revalidatePath("/products");
+  redirect("/products");
 }

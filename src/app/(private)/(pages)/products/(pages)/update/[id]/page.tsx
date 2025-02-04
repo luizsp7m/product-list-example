@@ -1,4 +1,4 @@
-import { getProductById } from "@/services/get-product-by-id";
+import { getProductById } from "@/actions/get-product-by-id";
 import { ProductForm } from "../../../_components/product-form";
 import { Metadata } from "next";
 
@@ -13,9 +13,5 @@ export default async function UpdateProductPage({
 }) {
   const product = await getProductById(params.id);
 
-  return (
-    <div>
-      <ProductForm product={product} />
-    </div>
-  );
+  return <ProductForm product={product} />;
 }

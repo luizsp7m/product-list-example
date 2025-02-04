@@ -21,8 +21,8 @@ export function createProductColumns({
       accessorKey: "name",
       header: "Product",
       cell: ({ row: { original: product } }) => (
-        <div className="flex gap-2 items-center">
-          <div className="relative flex justify-center items-center w-[48px] h-[48px] bg-secondary overflow-hidden rounded">
+        <div className="flex items-center gap-2">
+          <div className="relative flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded bg-secondary">
             <Image
               src={product.imageUrl}
               alt={`${product.name} image`}
@@ -49,7 +49,7 @@ export function createProductColumns({
     },
 
     {
-      accessorKey: "PRICE",
+      accessorKey: "price",
       header: () => <div className="text-right">Price</div>,
       cell: ({ row: { original: product } }) => {
         const price = currencyFormatter(product.price);

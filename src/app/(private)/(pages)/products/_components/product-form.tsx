@@ -35,7 +35,7 @@ import {
 
 import { Loader2 } from "lucide-react";
 import { Product } from "@/types/product";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { uploadImage } from "@/services/upload-image";
 import { productFormSchema } from "../_schemas/product-form-schema";
 import { useToast } from "@/hooks/use-toast";
@@ -140,173 +140,180 @@ export function ProductForm({ product }: ProductFormProps) {
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="mx-auto max-w-[768px] space-y-3"
-      >
-        <h5 className="text-muted-foreground">
-          {product ? "Update product" : "Create product"}
-        </h5>
+    <Fragment>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mx-auto max-w-[768px] space-y-3"
+        >
+          <h5 className="inline-block text-muted-foreground">
+            {product ? "Update product" : "Create product"}
+          </h5>
 
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
 
-              <FormControl>
-                <Input placeholder="Product name" {...field} />
-              </FormControl>
-
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select product category" />
-                  </SelectTrigger>
+                  <Input placeholder="Product name" {...field} />
                 </FormControl>
 
-                <SelectContent>
-                  {PRODUCT_CATEGORY_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription>
+                  This is your public display name.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="price"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Price</FormLabel>
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
 
-              <FormControl>
-                <MoneyInput
-                  placeholder="$ 0,00"
-                  value={field.value}
-                  onBlur={field.onBlur}
-                  disabled={field.disabled}
-                  onValueChange={({ floatValue }) => field.onChange(floatValue)}
-                />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="imageFile"
-          render={() => (
-            <FormItem>
-              <FormLabel>Image</FormLabel>
-
-              {imagePreview ? (
-                <div
-                  className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-md bg-secondary bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url(${imagePreview})`,
-                  }}
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
                 >
-                  <div className="absolute inset-0 rounded-md bg-black/30 backdrop-blur-md" />
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select product category" />
+                    </SelectTrigger>
+                  </FormControl>
 
-                  <div className="relative z-10 h-44 w-full overflow-hidden">
-                    <Image
-                      src={imagePreview}
-                      alt={"Product image"}
-                      fill
-                      sizes="100%"
-                      className="rounded-md"
-                      style={{
-                        objectFit: "contain",
-                      }}
-                    />
+                  <SelectContent>
+                    {PRODUCT_CATEGORY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-                    <Button
-                      variant="destructive"
-                      className="absolute right-2 top-2 text-xs"
-                      onClick={removeImage}
-                      type="button"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              ) : (
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Price</FormLabel>
+
                 <FormControl>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
+                  <MoneyInput
+                    placeholder="$ 0,00"
+                    value={field.value}
+                    onBlur={field.onBlur}
+                    disabled={field.disabled}
+                    onValueChange={({ floatValue }) =>
+                      field.onChange(floatValue)
+                    }
                   />
                 </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="imageFile"
+            render={() => (
+              <FormItem>
+                <FormLabel>Image</FormLabel>
+
+                {imagePreview ? (
+                  <div
+                    className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-md bg-secondary bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(${imagePreview})`,
+                    }}
+                  >
+                    <div className="absolute inset-0 rounded-md bg-black/30 backdrop-blur-md" />
+
+                    <div className="relative z-10 h-44 w-full overflow-hidden">
+                      <Image
+                        src={imagePreview}
+                        alt={"Product image"}
+                        fill
+                        sizes="100%"
+                        className="rounded-md"
+                        style={{
+                          objectFit: "contain",
+                        }}
+                      />
+
+                      <Button
+                        variant="destructive"
+                        className="absolute right-2 top-2 text-xs"
+                        onClick={removeImage}
+                        type="button"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </FormControl>
+                )}
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+
+                <FormControl>
+                  <Textarea
+                    placeholder="Product description"
+                    style={{ resize: "none" }}
+                    rows={5}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-end gap-3">
+            <Link
+              href={"/products"}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Cancel
+            </Link>
+
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting && (
+                <Loader2 className="animate-spin" />
               )}
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-
-              <FormControl>
-                <Textarea
-                  placeholder="Product description"
-                  style={{ resize: "none" }}
-                  rows={5}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end gap-3">
-          <Link
-            href={"/products"}
-            className={buttonVariants({ variant: "outline" })}
-          >
-            Cancel
-          </Link>
-
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting && (
-              <Loader2 className="animate-spin" />
-            )}
-
-            {product ? "Update" : "Create"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+              {product ? "Update" : "Create"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </Fragment>
   );
 }

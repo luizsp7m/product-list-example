@@ -5,7 +5,7 @@ export const productFormSchema = z.object({
   name: z.string().trim().min(3).max(256),
   category: z.nativeEnum(PRODUCT_CATEGORIES),
   price: z.number().positive(),
-  description: z.string().trim().min(3).max(256),
+  description: z.string().trim().min(3).max(512),
 
   imageFile:
     typeof window !== "undefined" && "FileList" in window
