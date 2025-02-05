@@ -2,7 +2,6 @@
 
 import { PRODUCT_CATEGORIES } from "@/constants/product-categories";
 import { db } from "@/lib/db";
-import { uploadImage } from "@/services/upload-image";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -98,18 +97,12 @@ export async function upsertProduct(
     description,
   } = validatedFields.data;
 
-  let imageUrl = prevImageUrl || "";
+  const imageUrl = prevImageUrl || "";
 
   if (imageFile) {
-    try {
-      imageUrl = await uploadImage(imageFile);
-    } catch (error) {
-      console.log(error);
-
-      return {
-        message: "Image upload failed",
-      };
-    }
+    return {
+      message: "Image upload failed",
+    };
   }
 
   const productData = {

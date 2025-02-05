@@ -37,7 +37,7 @@ import { Fragment, useState } from "react";
 import { productFormSchema } from "../_schemas/product-form-schema";
 import { useToast } from "@/hooks/use-toast";
 import { upsertProduct } from "@/actions/upsert-product";
-import { uploadImage } from "@/services/upload-image";
+import { uploadImage } from "@/actions/upload-image";
 import { useRouter } from "next/navigation";
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
@@ -82,7 +82,9 @@ export function ProductForm({ product }: ProductFormProps) {
 
     if (formValues.imageFile) {
       try {
-        imageUrl = await uploadImage(formValues.imageFile);
+        const formData = new FormData();
+        formData.append("imageFile", formValues.imageFile);
+        imageUrl = await uploadImage(formData);
       } catch (error) {
         toast({
           variant: "destructive",

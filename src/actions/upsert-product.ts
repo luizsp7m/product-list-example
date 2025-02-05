@@ -1,18 +1,9 @@
 "use server";
 
-import { PRODUCT_CATEGORIES } from "@/constants/product-categories";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-
-const upsertProductSchema = z.object({
-  id: z.string().trim().uuid().optional(),
-  name: z.string().trim().min(3).max(256),
-  category: z.nativeEnum(PRODUCT_CATEGORIES),
-  price: z.number().positive(),
-  imageUrl: z.string().trim().min(3),
-  description: z.string().trim().min(3).max(512),
-});
+import { upsertProductSchema } from "./_schemas/upsert-product-schema";
 
 type UpsertProductFormData = z.infer<typeof upsertProductSchema>;
 
