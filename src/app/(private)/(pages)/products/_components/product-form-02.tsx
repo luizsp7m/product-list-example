@@ -17,13 +17,13 @@ import {
 import { PRODUCT_CATEGORY_OPTIONS } from "@/constants/product-categories";
 import { CurrencyInput } from "./money-input";
 import { Textarea } from "@/components/ui/textarea";
-import { upsertProduct, UpsertProductState } from "@/actions/upsert-product";
 import { useFormState, useFormStatus } from "react-dom";
 import { Loader2 } from "lucide-react";
 import { FieldErrorMessage } from "./field-error-message";
 import { ImageUploadInput } from "./image-upload-input";
 import { Product } from "@/types/product";
 import { Fragment } from "react";
+import { upsertProduct, UpsertProductState } from "@/actions/upsert-product-02";
 
 interface ProductFormProps {
   product?: Product;
@@ -33,8 +33,6 @@ export function ProductForm({ product }: ProductFormProps) {
   const initialState: UpsertProductState = { message: null, errors: {} };
 
   const [state, formAction] = useFormState(upsertProduct, initialState);
-
-  console.log(state);
 
   return (
     <form action={formAction} className="mx-auto max-w-[768px] space-y-3">

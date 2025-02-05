@@ -19,9 +19,7 @@ import {
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { PRODUCT_CATEGORY_OPTIONS } from "@/constants/product-categories";
-
 import { Textarea } from "@/components/ui/textarea";
 import { MoneyInput } from "@/components/shared-components/money-input";
 
@@ -36,10 +34,11 @@ import {
 import { Loader2 } from "lucide-react";
 import { Product } from "@/types/product";
 import { Fragment, useState } from "react";
-import { uploadImage } from "@/services/upload-image";
 import { productFormSchema } from "../_schemas/product-form-schema";
 import { useToast } from "@/hooks/use-toast";
 import { upsertProduct } from "@/actions/upsert-product";
+import { uploadImage } from "@/services/upload-image";
+import { useRouter } from "next/navigation";
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
 
@@ -50,19 +49,21 @@ interface ProductFormProps {
 export function ProductForm({ product }: ProductFormProps) {
   const { toast } = useToast();
 
+  const router = useRouter();
+
   const [imagePreview, setImagePreview] = useState<string | null>(
     product?.imageUrl || null,
   );
-
-  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
     defaultValues: product
       ? {
+          id: product.id,
           name: product.name,
           category: product.category,
           price: product.price,
+          imageUrl: product.imageUrl,
           description: product.description,
         }
       : {
@@ -71,60 +72,61 @@ export function ProductForm({ product }: ProductFormProps) {
         },
   });
 
-  async function onSubmit(data: ProductFormData) {
-    if (!imagePreview && !imageFile) {
+  async function onSubmit(formValues: ProductFormData) {
+    if (!imagePreview) {
       form.setError("imageFile", { message: "Required" });
       return;
     }
 
-    let imageUrl = product?.imageUrl || "";
+    let imageUrl = formValues.imageUrl || "";
 
-    if (imageFile) {
+    if (formValues.imageFile) {
       try {
-        imageUrl = await uploadImage(imageFile);
+        imageUrl = await uploadImage(formValues.imageFile);
       } catch (error) {
-        console.error("Error uploading image:", error);
-
-        form.setError("imageFile", {
-          message: "Failed to upload image. Try again.",
+        toast({
+          variant: "destructive",
+          title: "Something went wrong",
+          description: "Image upload failed",
         });
 
         return;
       }
     }
 
-    try {
-      await upsertProduct({
-        id: product?.id,
-        name: data.name,
-        category: data.category,
-        description: data.description,
-        imageUrl,
-        price: data.price,
-      });
+    const upsertProductResponse = await upsertProduct({
+      id: formValues.id,
+      name: formValues.name,
+      category: formValues.category,
+      price: formValues.price,
+      imageUrl,
+      description: formValues.description,
+    });
 
-      toast({
-        description: product
-          ? "Product updated successfully!"
-          : "Product created successfully!",
-      });
-    } catch (error) {
-      console.log(error);
-
+    if (!upsertProductResponse.success) {
       toast({
         variant: "destructive",
-        title: "Something went wrong.",
-        description: "There was a problem with your request.",
+        title: "Something went wrong",
+        description: upsertProductResponse.message,
       });
+
+      return;
     }
+
+    toast({
+      description: product
+        ? "Product updated successfully!"
+        : "Product created successfully!",
+    });
+
+    router.push("/products");
   }
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
 
     if (selectedFile) {
-      setImageFile(selectedFile);
-      form.setValue("imageFile", event.target.files!, { shouldValidate: true });
+      form.setValue("imageFile", selectedFile, { shouldValidate: true });
 
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result as string);
@@ -134,9 +136,8 @@ export function ProductForm({ product }: ProductFormProps) {
 
   const removeImage = () => {
     setImagePreview(null);
-    setImageFile(null);
 
-    form.setValue("imageFile", new DataTransfer().files, {
+    form.setValue("imageFile", undefined, {
       shouldValidate: true,
     });
   };

@@ -1,6 +1,6 @@
 import { getProductById } from "@/actions/get-product-by-id";
 import { Metadata } from "next";
-import { ProductForm } from "../../../_components/product-form-sc";
+import { ProductForm } from "../../../_components/product-form";
 
 export const metadata: Metadata = {
   title: "Update",
