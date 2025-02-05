@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PRODUCT_CATEGORY_OPTIONS } from "@/constants/product-categories";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 const ITEMS_PER_PAGE = [10, 20, 30];
 
@@ -63,83 +64,104 @@ export function Toolbar() {
         <div className="2xl:flex-1">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField
-                control={form.control}
-                name="search"
-                render={({ field }) => (
-                  <Input placeholder="Search products" {...field} />
-                )}
-              />
+              <div className="space-y-2">
+                <Label>Search</Label>
+
+                <FormField
+                  control={form.control}
+                  name="search"
+                  render={({ field }) => (
+                    <Input placeholder="Search products" {...field} />
+                  )}
+                />
+              </div>
             </form>
           </Form>
         </div>
 
         <div className="flex flex-col gap-3 md:flex-row 2xl:flex-1">
           <div className="md:flex-1">
-            <Select
-              onValueChange={(perPage) => handleChangePerPage(Number(perPage))}
-              value={String(
-                ITEMS_PER_PAGE.find((value) => String(value) === perPage) || ""
-              )}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Items per page" />
-              </SelectTrigger>
+            <div className="space-y-2">
+              <Label>Items per page</Label>
 
-              <SelectContent>
-                {ITEMS_PER_PAGE.map((perPage, index) => (
-                  <SelectItem key={index} value={String(perPage)}>
-                    {perPage} items per page
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select
+                onValueChange={(perPage) =>
+                  handleChangePerPage(Number(perPage))
+                }
+                value={String(
+                  ITEMS_PER_PAGE.find((value) => String(value) === perPage) ||
+                    "",
+                )}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Items per page" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {ITEMS_PER_PAGE.map((perPage, index) => (
+                    <SelectItem key={index} value={String(perPage)}>
+                      {perPage} items per page
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="md:flex-1">
-            <Select
-              onValueChange={handleChangeOrderBy}
-              value={
-                PRODUCTS_ORDER_BY_OPTIONS.find(
-                  (option) => option.value === orderBy
-                )?.value || ""
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Order by" />
-              </SelectTrigger>
+            <div className="space-y-2">
+              <Label>Order by</Label>
 
-              <SelectContent>
-                {PRODUCTS_ORDER_BY_OPTIONS.map((option, index) => (
-                  <SelectItem key={index} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select
+                onValueChange={handleChangeOrderBy}
+                value={
+                  PRODUCTS_ORDER_BY_OPTIONS.find(
+                    (option) => option.value === orderBy,
+                  )?.value || ""
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Order by" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {PRODUCTS_ORDER_BY_OPTIONS.map((option, index) => (
+                    <SelectItem key={index} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="md:flex-1">
-            <Select
-              onValueChange={(newCategory) => handleChangeCategory(newCategory)}
-              value={String(
-                PRODUCT_CATEGORY_OPTIONS.find(
-                  (option) => option.value === category
-                )?.value || ""
-              )}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
+            <div className="space-y-2">
+              <Label>Category</Label>
 
-              <SelectContent>
-                {PRODUCT_CATEGORY_OPTIONS.map((category) => (
-                  <SelectItem key={category.value} value={category.value}>
-                    {category.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select
+                onValueChange={(newCategory) =>
+                  handleChangeCategory(newCategory)
+                }
+                value={String(
+                  PRODUCT_CATEGORY_OPTIONS.find(
+                    (option) => option.value === category,
+                  )?.value || "",
+                )}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {PRODUCT_CATEGORY_OPTIONS.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>

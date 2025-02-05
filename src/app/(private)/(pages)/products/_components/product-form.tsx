@@ -109,6 +109,8 @@ export function ProductForm({ product }: ProductFormProps) {
           : "Product created successfully!",
       });
     } catch (error) {
+      console.log(error);
+
       toast({
         variant: "destructive",
         title: "Something went wrong.",
@@ -296,7 +298,7 @@ export function ProductForm({ product }: ProductFormProps) {
             )}
           />
 
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-2">
             <Link
               href={"/products"}
               className={buttonVariants({ variant: "outline" })}
